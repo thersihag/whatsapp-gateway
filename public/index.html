@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om Advertisement - WhatsApp Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .log-container { scrollbar-width: thin; }
+        .log-container::-webkit-scrollbar { width: 6px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-700 py-5 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-600 p-3 rounded-2xl">
+                    <i class="fab fa-whatsapp text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">Om Advertisement</h1>
+                    <p class="text-emerald-400 text-sm">WhatsApp Bulk Gateway</p>
+                </div>
+            </div>
+            <div id="topStatus" class="flex items-center gap-2 text-sm font-medium">
+                <!-- Dynamic Status -->
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+
+        <!-- Auth / QR Panel -->
+        <div id="qrPanel" class="hidden max-w-md mx-auto bg-slate-900 rounded-3xl p-10 text-center border border-slate-700">
+            <i class="fas fa-qrcode text-6xl text-emerald-500 mb-6"></i>
+            <h2 class="text-3xl font-bold mb-2">Connect WhatsApp</h2>
+            <p class="text-slate-400 mb-8">Scan this QR code with your WhatsApp app → Linked Devices</p>
+            
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-2xl">
+                <img id="qrImage" class="w-64 h-64" alt="QR Code">
+            </div>
+            
+            <p class="text-xs text-slate-500 mt-6">Session usually lasts 14+ days</p>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Left Side: Sending Form -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- Bulk Sender -->
+                <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                        <i class="fas fa-paper-plane text-emerald-500"></i>
+                        Bulk Message Campaign
+                    </h3>
+                    
+                    <form id="bulkForm" enctype="multipart/form-data">
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Phone Numbers (Comma Separated)</label>
+                            <textarea id="numbers" rows="4" 
+                                class="w-full bg-slate-800 border border-slate-600 rounded-2xl p-4 text-sm focus:outline-none focus:border-emerald-500"
+                                placeholder="919876543210, 918765432109, ..."></textarea>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Message Content</label>
+                            <textarea id="message" rows="4" 
+                                class="w-full bg-slate-800 border border-slate-600 rounded-2xl p-4 text-sm focus:outline-none focus:border-emerald-500"
+                                placeholder="Hello, this is Om Advertisement..."></textarea>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Attach Image (Optional)</label>
+                            <input type="file" id="media" accept="image/*" 
+                                class="w-full bg-slate-800 border border-slate-600 rounded-2xl p-4 text-sm">
+                        </div>
+
+                        <button type="submit" id="sendBtn"
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold py-5 rounded-2xl transition text-lg flex items-center justify-center gap-2">
+                            <i class="fas fa-rocket"></i>
+                            START BULK SENDING
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Right Side: Logs + Quick Send -->
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- Live Logs -->
+                <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 h-[520px] flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold flex items-center gap-2">
+                            <i class="fas fa-terminal text-emerald-500"></i>
+                            Live Activity
+                        </h3>
+                        <span id="sendingStatus" class="hidden px-4 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full animate-pulse">
+                            SENDING IN PROGRESS...
+                        </span>
+                    </div>
+                    
+                    <div id="logs" class="flex-1 bg-slate-950 border border-slate-700 rounded-2xl p-5 overflow-y-auto text-sm font-mono log-container space-y-1 text-slate-300">
+                        <!-- Logs injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Quick Single Send -->
+                <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6">
+                    <h3 class="font-semibold mb-4">Quick Single Message</h3>
+                    <input type="text" id="quickNumber" placeholder="919876543210" 
+                        class="w-full bg-slate-800 border border-slate-600 rounded-2xl px-5 py-4 mb-3">
+                    <textarea id="quickText" placeholder="Type your message..." rows="3"
+                        class="w-full bg-slate-800 border border-slate-600 rounded-2xl px-5 py-4 mb-4"></textarea>
+                    <button onclick="sendQuickMessage()" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 py-4 rounded-2xl font-medium">
+                        Send Single Message
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 bg-slate-800 border border-slate-600 rounded-2xl px-6 py-4 shadow-2xl">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        let isSending = false;
+
+        function showToast(msg, color = 'emerald') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerHTML = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        async function checkStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                const statusEl = document.getElementById('topStatus');
+
+                if (data.status === 'CONNECTED') {
+                    statusEl.innerHTML = `<span class="text-emerald-500">● Connected</span> <span class="text-slate-400">${data.number}</span>`;
+                    document.getElementById('qrPanel').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                } else if (data.status === 'DISCONNECTED' && data.qr) {
+                    statusEl.innerHTML = `<span class="text-amber-500">● Waiting for Scan</span>`;
+                    document.getElementById('qrPanel').classList.remove('hidden');
+                    document.getElementById('dashboard').classList.add('hidden');
+                    document.getElementById('qrImage').src = data.qr;
+                }
+            } catch (e) {}
+        }
+
+        async function checkLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                const data = await res.json();
+                
+                const logsDiv = document.getElementById('logs');
+                logsDiv.innerHTML = data.logs.map(log => `
+                    <div class="${log.type === 'success' ? 'text-emerald-400' : log.type === 'error' ? 'text-red-400' : 'text-slate-400'}">
+                        [${log.time}] ${log.message}
+                    </div>
+                `).join('');
+
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+
+                isSending = data.isSending;
+                document.getElementById('sendingStatus').classList.toggle('hidden', !isSending);
+            } catch (e) {}
+        }
+
+        // Bulk Form Submit
+        document.getElementById('bulkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (isSending) return showToast("Already sending messages...", "amber");
+
+            const formData = new FormData();
+            formData.append('numbers', document.getElementById('numbers').value);
+            formData.append('message', document.getElementById('message').value);
+            
+            const mediaFile = document.getElementById('media').files[0];
+            if (mediaFile) formData.append('media', mediaFile);
+
+            try {
+                const res = await fetch('/api/send-bulk', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                showToast(result.message || "Campaign Started!", "emerald");
+            } catch (err) {
+                showToast("Failed to start campaign", "red");
+            }
+        });
+
+        // Quick Single Message
+        async function sendQuickMessage() {
+            const number = document.getElementById('quickNumber').value.trim();
+            const text = document.getElementById('quickText').value.trim();
+
+            if (!number || !text) return showToast("Number and message required", "amber");
+
+            try {
+                const res = await fetch(`/api/send?number=${encodeURIComponent(number)}&text=${encodeURIComponent(text)}`);
+                const data = await res.json();
+                showToast(data.success ? "Message Sent!" : data.error, data.success ? "emerald" : "red");
+            } catch (err) {
+                showToast("Failed to send message", "red");
+            }
+        }
+
+        // Auto Refresh
+        setInterval(checkStatus, 2500);
+        setInterval(checkLogs, 1500);
+
+        // Initial Load
+        checkStatus();
+        checkLogs();
+    </script>
+</body>
+</html>
