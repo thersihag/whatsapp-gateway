@@ -14,160 +14,169 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen">
 <!-- Header -->
-<header class="bg-slate-900 border-b border-slate-800 py-4 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-3">
-            <div class="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-500/20">
-                <i class="fab fa-whatsapp text-3xl text-white animate-pulse"></i>
-            </div>
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
-                    Om Advertisement
-                    <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">v2.0 Multi-Account</span>
-                </h1>
-                <p class="text-slate-400 text-sm">Enterprise Multi-Instance Bulk Gateway</p>
-            </div>
+<!-- Gatekeeper Session Prompt Modal (Shows first, blocks UI) -->
+<div id="gatekeeperModal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-6 transition-all duration-300">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        
+        <div class="bg-emerald-600/10 p-4 rounded-2xl inline-block mb-6 border border-emerald-500/20">
+            <i class="fas fa-shield-alt text-4xl text-emerald-400"></i>
         </div>
         
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="/api" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 border border-slate-700">
-                <i class="fas fa-code"></i> Integration API Docs
-            </a>
-            <div id="topStatus" class="flex items-center gap-2 text-sm font-medium bg-slate-950 border border-slate-800 px-4 py-2 rounded-xl">
-                <span class="text-slate-500">● Checking Status</span>
+        <h2 class="text-2xl font-bold mb-2">Access WA Gateway</h2>
+        <p class="text-slate-400 text-sm mb-6">Enter your designated Session ID to connect your device and access your dashboard.</p>
+        
+        <div class="space-y-4">
+            <div class="relative">
+                <i class="fas fa-fingerprint absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                <input type="text" id="initialSessionInput" placeholder="Enter Session ID (e.g., rahul, amit1)" 
+                    class="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-11 pr-4 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-200">
             </div>
+            <button onclick="submitGatekeeperSession()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-4 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20">
+                Access My Workspace <i class="fas fa-arrow-right"></i>
+            </button>
         </div>
+        <p class="text-[10px] text-slate-500 mt-6">Secure Multi-Instance Isolation Enabled</p>
     </div>
-</header>
+</div>
 
-<div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
-
-    <!-- Session Selector Panel -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-                <h2 class="text-lg font-bold mb-1 flex items-center gap-2">
-                    <i class="fas fa-users text-emerald-500"></i>
-                    Select / Switch Session
-                </h2>
-                <p class="text-slate-400 text-sm">Select a specific session to manage individual accounts or scan unique QRs.</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <div class="relative flex-1 md:w-64">
-                    <i class="fas fa-fingerprint absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="text" id="sessionInput" value="default" placeholder="Enter session (e.g., rahul, amit)" 
-                        class="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+<!-- Main Workspace (Hidden until Session is Entered) -->
+<div id="workspaceContent" class="opacity-0 transition-opacity duration-500 pointer-events-none">
+    
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 py-4 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-500/20">
+                    <i class="fab fa-whatsapp text-3xl text-white"></i>
                 </div>
-                <button onclick="loadActiveSession()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-3 rounded-2xl transition flex items-center gap-2">
-                    <i class="fas fa-sync"></i>
-                    Switch Session
-                </button>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        Om Advertisement
+                        <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">v2.0 Multi-Account</span>
+                    </h1>
+                    <p class="text-slate-400 text-xs">Enterprise Bulk Gateway • Session: <span id="currentSessionTag" class="text-emerald-400 font-bold font-mono">None</span></p>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Connection/QR Workspace Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-        <!-- Left Panel: Connection Controller & Forms -->
-        <div class="lg:col-span-7 space-y-8">
             
-            <!-- QR Code Login Module -->
-            <div id="qrPanel" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center relative overflow-hidden shadow-2xl">
-                <div class="absolute top-4 left-4 bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20 px-3 py-1 rounded-full flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
-                    Action Required
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="switchSessionPrompt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700">
+                    <i class="fas fa-exchange-alt text-emerald-400"></i> Switch Session / Logout
+                </button>
+                <a href="/api" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700">
+                    <i class="fas fa-code"></i> Integration API Docs
+                </a>
+                <div id="topStatus" class="flex items-center gap-2 text-sm font-medium bg-slate-950 border border-slate-800 px-4 py-2 rounded-xl">
+                    <span class="text-slate-500">● Checking Status</span>
                 </div>
-                <div class="text-slate-400 text-sm text-right absolute top-4 right-4" id="sessionTag">Session: default</div>
-                
-                <i class="fas fa-qrcode text-6xl text-emerald-500 mt-6 mb-4"></i>
-                <h2 class="text-2xl font-bold mb-2">Connect New Account</h2>
-                <p class="text-slate-400 text-sm max-w-md mx-auto mb-6">Open WhatsApp on your phone, go to Linked Devices -> Link a Device, then point your camera to scan this QR code.</p>
-                
-                <div class="bg-white p-4 rounded-3xl inline-block shadow-2xl border-4 border-emerald-500/20">
-                    <img id="qrImage" class="w-60 h-60" alt="Scanning QR code..." src="">
-                </div>
-                
-                <p class="text-xs text-slate-500 mt-6">Sessions are automatically stored and kept persistent across service restarts.</p>
             </div>
-
-            <!-- Bulk Campaign Sender Form -->
-            <div id="bulkPanel" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
-                <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
-                    <i class="fas fa-rocket text-emerald-500"></i>
-                    Launch Bulk Campaign
-                </h3>
-                
-                <form id="bulkForm" enctype="multipart/form-data">
-                    <div class="mb-5">
-                        <label class="block text-sm font-medium text-slate-400 mb-2">Phone Numbers (Comma or Line Separated)</label>
-                        <textarea id="numbers" rows="5" 
-                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-200"
-                            placeholder="919876543210&#10;918765432109&#10;917654321098"></textarea>
-                        <span class="text-xs text-slate-500 mt-1 block">Indian numbers must start with '91' and contain no dashes/spaces.</span>
-                    </div>
-
-                    <div class="mb-5">
-                        <label class="block text-sm font-medium text-slate-400 mb-2">Message Content</label>
-                        <textarea id="message" rows="4" 
-                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-200"
-                            placeholder="Write your text template here. Plain texts or message formatting applies..."></textarea>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-400 mb-2">Attach Promotional Image (Optional)</label>
-                        <input type="file" id="media" accept="image/*" 
-                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm text-slate-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-500 file:text-slate-950 hover:file:bg-emerald-600">
-                    </div>
-
-                    <button type="submit" id="sendBtn"
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-5 rounded-2xl transition text-lg flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10">
-                        <i class="fas fa-paper-plane"></i>
-                        START BULK DISPATCHING
-                    </button>
-                </form>
-            </div>
-
         </div>
+    </header>
 
-        <!-- Right Panel: Live Activity Monitoring & Single Send -->
-        <div class="lg:col-span-5 space-y-8">
+    <div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
-            <!-- Real-time Status and Activity Logs -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-[560px] flex flex-col shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold flex items-center gap-2">
-                        <i class="fas fa-terminal text-emerald-500"></i>
-                        Session Activity Logs
-                    </h3>
-                    <span id="sendingStatus" class="hidden px-4 py-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full animate-pulse border border-emerald-500/20">
-                        SENDING ACTIVE
-                    </span>
-                </div>
+        <!-- Connection/QR Workspace Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Left Panel: Connection Controller & Forms -->
+            <div class="lg:col-span-7 space-y-8">
                 
-                <div id="logs" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-5 overflow-y-auto text-xs font-mono log-container space-y-2 text-slate-300">
-                    <!-- Activity traces injection -->
+                <!-- QR Code Login Module -->
+                <div id="qrPanel" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center relative overflow-hidden shadow-2xl">
+                    <div class="absolute top-4 left-4 bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20 px-3 py-1 rounded-full flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                        Action Required
+                    </div>
+                    
+                    <i class="fas fa-qrcode text-6xl text-emerald-500 mt-6 mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Connect Your Account</h2>
+                    <p class="text-slate-400 text-sm max-w-md mx-auto mb-6">Open WhatsApp on your phone, go to Linked Devices -> Link a Device, then point your camera to scan this QR code.</p>
+                    
+                    <div class="bg-white p-4 rounded-3xl inline-block shadow-2xl border-4 border-emerald-500/20">
+                        <img id="qrImage" class="w-60 h-60" alt="Generating QR code..." src="">
+                    </div>
+                    
+                    <p class="text-xs text-slate-500 mt-6">Sessions are automatically stored and kept persistent across service restarts.</p>
                 </div>
+
+                <!-- Bulk Campaign Sender Form -->
+                <div id="bulkPanel" class="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                        <i class="fas fa-rocket text-emerald-500"></i>
+                        Launch Bulk Campaign
+                    </h3>
+                    
+                    <form id="bulkForm" enctype="multipart/form-data">
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Phone Numbers (Comma or Line Separated)</label>
+                            <textarea id="numbers" rows="5" 
+                                class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-200"
+                                placeholder="919876543210&#10;918765432109&#10;917654321098"></textarea>
+                            <span class="text-xs text-slate-500 mt-1 block">Indian numbers must start with '91' and contain no dashes/spaces.</span>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Message Content</label>
+                            <textarea id="message" rows="4" 
+                                class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-slate-200"
+                                placeholder="Write your text template here. Plain texts or message formatting applies..."></textarea>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Attach Promotional Image (Optional)</label>
+                            <input type="file" id="media" accept="image/*" 
+                                class="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-sm text-slate-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-500 file:text-slate-950 hover:file:bg-emerald-600">
+                        </div>
+
+                        <button type="submit" id="sendBtn"
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-5 rounded-2xl transition text-lg flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10">
+                            <i class="fas fa-paper-plane"></i>
+                            START BULK DISPATCHING
+                        </button>
+                    </form>
+                </div>
+
             </div>
 
-            <!-- Single Messaging Block -->
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
-                <h3 class="font-bold mb-4 flex items-center gap-2">
-                    <i class="fas fa-share"></i>
-                    Quick Test Messenger
-                </h3>
-                <div class="space-y-4">
-                    <input type="text" id="quickNumber" placeholder="919876543210 (Target)" 
-                        class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                    <textarea id="quickText" placeholder="Compose message..." rows="2"
-                        class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"></textarea>
-                    <button onclick="sendQuickMessage()" 
-                        class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-2xl font-semibold text-slate-300 transition border border-slate-700">
-                        Send Quick Test Message
-                    </button>
-                </div>
-            </div>
+            <!-- Right Panel: Live Activity Monitoring & Single Send -->
+            <div class="lg:col-span-5 space-y-8">
 
+                <!-- Real-time Status and Activity Logs -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 h-[560px] flex flex-col shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold flex items-center gap-2">
+                            <i class="fas fa-terminal text-emerald-500"></i>
+                            Session Activity Logs
+                        </h3>
+                        <span id="sendingStatus" class="hidden px-4 py-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-full animate-pulse border border-emerald-500/20">
+                            SENDING ACTIVE
+                        </span>
+                    </div>
+                    
+                    <div id="logs" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl p-5 overflow-y-auto text-xs font-mono log-container space-y-2 text-slate-300">
+                        <!-- Activity traces injection -->
+                    </div>
+                </div>
+
+                <!-- Single Messaging Block -->
+                <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                    <h3 class="font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-share"></i>
+                        Quick Test Messenger
+                    </h3>
+                    <div class="space-y-4">
+                        <input type="text" id="quickNumber" placeholder="919876543210 (Target)" 
+                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                        <textarea id="quickText" placeholder="Compose message..." rows="2"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"></textarea>
+                        <button onclick="sendQuickMessage()" 
+                            class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-2xl font-semibold text-slate-300 transition border border-slate-700">
+                            Send Quick Test Message
+                        </button>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -182,7 +191,7 @@
 
 <script>
     let isSending = false;
-    let activeSession = 'default';
+    let activeSession = null;
     let statusInterval = null;
     let logsInterval = null;
 
@@ -208,23 +217,67 @@
         setTimeout(() => toast.classList.add('hidden'), 4000);
     }
 
+    // Gatekeeper flow
+    function submitGatekeeperSession() {
+        const val = document.getElementById('initialSessionInput').value.trim();
+        if (!val || val.length < 3) {
+            return showToast("Please enter a valid Session ID (minimum 3 chars)", "warning");
+        }
+
+        // Save session & remove blocker
+        activeSession = val.toLowerCase().replace(/[^a-z0-9]/g, ''); // Alpha-numeric enforce
+        localStorage.setItem('wa_gateway_session', activeSession);
+        
+        initializeDashboard();
+    }
+
+    function switchSessionPrompt() {
+        // Disconnect current refresh hooks
+        if (statusInterval) clearInterval(statusInterval);
+        if (logsInterval) clearInterval(logsInterval);
+
+        localStorage.removeItem('wa_gateway_session');
+        activeSession = null;
+
+        // UI Adjustments
+        document.getElementById('workspaceContent').className = "opacity-0 transition-opacity duration-500 pointer-events-none";
+        document.getElementById('gatekeeperModal').classList.remove('hidden');
+        document.getElementById('initialSessionInput').value = '';
+        document.getElementById('initialSessionInput').focus();
+    }
+
+    function initializeDashboard() {
+        // Hide blocker modal, activate content view
+        document.getElementById('gatekeeperModal').classList.add('hidden');
+        
+        const content = document.getElementById('workspaceContent');
+        content.classList.remove('pointer-events-none');
+        content.className = "opacity-100 transition-opacity duration-500";
+
+        document.getElementById('currentSessionTag').innerText = activeSession;
+
+        // Load statuses and start polling
+        checkStatus();
+        checkLogs();
+        setupPollers();
+        showToast(`Loaded Gateway Instance [${activeSession}]`, 'success');
+    }
+
     // Fetch WhatsApp Instance Status
     async function checkStatus() {
+        if (!activeSession) return;
         try {
             const res = await fetch(`/api/status/${activeSession}`);
             const data = await res.json();
             const statusEl = document.getElementById('topStatus');
             const qrImage = document.getElementById('qrImage');
             const qrPanel = document.getElementById('qrPanel');
-            const sessionTag = document.getElementById('sessionTag');
-
-            sessionTag.innerText = `Session: ${activeSession}`;
 
             if (data.status === 'CONNECTED') {
-                statusEl.innerHTML = `<span class="text-emerald-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>● Connected: ${activeSession} (${data.number})</span>`;
+                statusEl.innerHTML = `<span class="text-emerald-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>● Connected: ${data.number}</span>`;
                 qrPanel.classList.add('hidden');
             } else {
-                statusEl.innerHTML = `<span class="text-amber-500 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>● Logged Out [${activeSession}]</span>`;
+                statusEl.innerHTML = `<span class="text-amber-500 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>● Waiting for Scan [${activeSession}]</span>`;
                 qrPanel.classList.remove('hidden');
                 if (data.qr) {
                     qrImage.src = data.qr;
@@ -240,13 +293,14 @@
 
     // Fetch Live logs and execution queues
     async function checkLogs() {
+        if (!activeSession) return;
         try {
             const res = await fetch(`/api/logs/${activeSession}`);
             const data = await res.json();
             
             const logsDiv = document.getElementById('logs');
             
-            if (data.logs.length === 0) {
+            if (!data.logs || data.logs.length === 0) {
                 logsDiv.innerHTML = `<div class="text-slate-500 italic">No current activity recorded. Send a message to start logging.</div>`;
             } else {
                 logsDiv.innerHTML = data.logs.map(log => {
@@ -258,7 +312,6 @@
                 }).join('');
             }
 
-            // Smooth bottom scroll
             logsDiv.scrollTop = logsDiv.scrollHeight;
 
             isSending = data.isSending;
@@ -266,19 +319,6 @@
         } catch (e) {
             console.error("Logs update loop error:", e);
         }
-    }
-
-    // Action Trigger: Active Session Changeover
-    function loadActiveSession() {
-        const val = document.getElementById('sessionInput').value.trim();
-        if (!val) return showToast("Session ID cannot be empty", "warning");
-
-        activeSession = val.toLowerCase();
-        showToast(`Loading Gateway Workspace for: [${activeSession}]`, 'info');
-
-        // Trigger immediate refresh updates
-        checkStatus();
-        checkLogs();
     }
 
     // Submit Bulk Campaign Trigger Handler
@@ -347,11 +387,16 @@
         logsInterval = setInterval(checkLogs, 2000);
     }
 
-    // Setup execution bindings on boot
+    // Auto checks on initial system bootup
     window.addEventListener('DOMContentLoaded', () => {
-        setupPollers();
-        checkStatus();
-        checkLogs();
+        const stored = localStorage.getItem('wa_gateway_session');
+        if (stored) {
+            activeSession = stored;
+            initializeDashboard();
+        } else {
+            document.getElementById('gatekeeperModal').classList.remove('hidden');
+            document.getElementById('initialSessionInput').focus();
+        }
     });
 </script>
 
