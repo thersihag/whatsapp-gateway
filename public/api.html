@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Links - Om Advertisement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-emerald-500">🔗 API Endpoints</h1>
+        
+        <div class="bg-slate-900 rounded-3xl p-8 border border-slate-700">
+            <h2 class="text-xl font-semibold mb-4">Single Message Send API</h2>
+            <div class="bg-slate-950 p-5 rounded-2xl font-mono text-sm break-all">
+                https://yourdomain.onrender.com/api/send?session=default&number=919876543210&text=Hello%20this%20is%20test
+            </div>
+            <p class="text-slate-400 text-sm mt-3">You can change <code>session</code> name (default, user2, user3, etc.)</p>
+        </div>
+
+        <div class="mt-8 grid gap-6">
+            <div class="bg-slate-900 p-6 rounded-3xl">
+                <h3 class="font-bold mb-3">Examples:</h3>
+                <ul class="space-y-4 text-sm">
+                    <li><strong>With Media:</strong><br>
+                        <code>/api/send?session=user1&number=919876543210&text=Hello&media=https://image-url.jpg</code>
+                    </li>
+                    <li><strong>Different Account:</strong><br>
+                        <code>/api/send?session=rahul2&number=919555555555&text=Offer chal rahi hai</code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
