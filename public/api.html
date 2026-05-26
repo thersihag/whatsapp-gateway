@@ -7,30 +7,186 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 p-8">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8 text-emerald-500">🔗 API Endpoints</h1>
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-6">
+        <div>
+            <a href="/" class="text-xs font-semibold text-emerald-400 hover:underline flex items-center gap-1 mb-2">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-extrabold text-white flex items-center gap-3">
+                <i class="fas fa-plug text-emerald-500"></i> API Integrations Portal
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Hook Om Advertisement's multi-channel system to CRM, ERP or custom scripts.</p>
+        </div>
+        <div class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1.5 rounded-full border border-emerald-500/30 font-bold uppercase tracking-wider">
+            Active Gateway
+        </div>
+    </div>
+
+    <!-- Interactive Sandbox Builder -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+            <i class="fas fa-sliders-h text-emerald-500"></i> Interactive Endpoint URL Builder
+        </h2>
+        <p class="text-slate-400 text-sm mb-6">Modify details below to customize, test, and copy deployment endpoints instantly.</p>
         
-        <div class="bg-slate-900 rounded-3xl p-8 border border-slate-700">
-            <h2 class="text-xl font-semibold mb-4">Single Message Send API</h2>
-            <div class="bg-slate-950 p-5 rounded-2xl font-mono text-sm break-all">
-                https://yourdomain.onrender.com/api/send?session=default&number=919876543210&text=Hello%20this%20is%20test
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Target Session ID</label>
+                <input type="text" id="apiSession" value="default" oninput="buildApiUrl()"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
             </div>
-            <p class="text-slate-400 text-sm mt-3">You can change <code>session</code> name (default, user2, user3, etc.)</p>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Recipient Phone</label>
+                <input type="text" id="apiPhone" value="919876543210" oninput="buildApiUrl()"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Message Content</label>
+                <textarea id="apiText" rows="2" oninput="buildApiUrl()"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">Greetings! This is a test dispatch from the dynamic integration node.</textarea>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Attach Media Link URL (Optional)</label>
+                <input type="text" id="apiMedia" value="" placeholder="https://example.com/promo-banner.jpg" oninput="buildApiUrl()"
+                    class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            </div>
         </div>
 
-        <div class="mt-8 grid gap-6">
-            <div class="bg-slate-900 p-6 rounded-3xl">
-                <h3 class="font-bold mb-3">Examples:</h3>
-                <ul class="space-y-4 text-sm">
-                    <li><strong>With Media:</strong><br>
-                        <code>/api/send?session=user1&number=919876543210&text=Hello&media=https://image-url.jpg</code>
-                    </li>
-                    <li><strong>Different Account:</strong><br>
-                        <code>/api/send?session=rahul2&number=919555555555&text=Offer chal rahi hai</code>
-                    </li>
-                </ul>
+        <!-- Dynamic Link Panel -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">GET Webhook Request URL</span>
+                <div class="flex gap-2">
+                    <button onclick="triggerApiCall()" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 transition">
+                        <i class="fas fa-play"></i> Test Endpoint
+                    </button>
+                    <button onclick="copyToClipboard()" class="text-xs text-slate-300 hover:text-white font-bold bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                        <i class="fas fa-copy"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+            <div class="font-mono text-xs text-emerald-400 break-all select-all select-none p-3 bg-slate-900 border border-slate-800 rounded-xl" id="outputUrl">
+                Generating endpoint...
             </div>
         </div>
     </div>
+
+    <!-- Documentation Guides -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+            <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                <i class="fas fa-code-branch text-emerald-500"></i> Code Sandbox (Node.js)
+            </h3>
+            <pre class="bg-slate-950 p-4 rounded-2xl text-xs font-mono text-slate-300 overflow-x-auto">
+
+
+const axios = require('axios');
+
+axios.get('ENDPOINT_URL')
+.then(response => {
+console.log('Message Dispatched:', response.data);
+})
+.catch(error => {
+console.error('Dispatch Fail:', error.response.data);
+});
+
+
+
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+            <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                <i class="fas fa-exchange-alt text-emerald-500"></i> Response Envelopes
+            </h3>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-xs font-bold text-emerald-400">SUCCESS RETURN (200 OK)</span>
+                    <pre class="bg-slate-950 p-3 rounded-xl text-[10px] font-mono text-slate-300">
+
+
+{
+"success": true,
+"message": "Message dispatched successfully."
+}
+
+
+
+BAD INSTANCE ERROR (400)
+
+{
+"error": "Session [rahul] is not logged in. Scan QR Code first."
+}
+
+
+
+
+
+
+</div>
+
+<!-- Alert Dialog -->
+<div id="apiAlert" class="hidden fixed bottom-6 right-6 bg-slate-900 border border-emerald-500/50 rounded-2xl px-6 py-4 shadow-2xl z-50 flex items-center gap-3">
+    <span id="apiAlertMessage" class="text-sm font-medium text-slate-200"></span>
+</div>
+
+<script>
+    function showAlert(msg, isSuccess = true) {
+        const alertBox = document.getElementById('apiAlert');
+        const alertMsg = document.getElementById('apiAlertMessage');
+        
+        alertBox.className = isSuccess 
+            ? "fixed bottom-6 right-6 bg-slate-900 border border-emerald-500/50 rounded-2xl px-6 py-4 shadow-2xl z-50 flex items-center gap-3 text-emerald-400"
+            : "fixed bottom-6 right-6 bg-slate-900 border border-red-500/50 rounded-2xl px-6 py-4 shadow-2xl z-50 flex items-center gap-3 text-red-400";
+        
+        alertMsg.innerText = msg;
+        alertBox.classList.remove('hidden');
+        setTimeout(() => alertBox.classList.add('hidden'), 3500);
+    }
+
+    function buildApiUrl() {
+        const host = window.location.origin;
+        const session = document.getElementById('apiSession').value.trim() || 'default';
+        const number = document.getElementById('apiPhone').value.trim() || '919876543210';
+        const text = encodeURIComponent(document.getElementById('apiText').value.trim());
+        const media = encodeURIComponent(document.getElementById('apiMedia').value.trim());
+
+        let finalUrl = `${host}/api/send?session=${session}&number=${number}&text=${text}`;
+        if (media) {
+            finalUrl += `&media=${media}`;
+        }
+
+        document.getElementById('outputUrl').innerText = finalUrl;
+    }
+
+    async function triggerApiCall() {
+        const url = document.getElementById('outputUrl').innerText;
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (res.ok) {
+                showAlert("API Webhook executed. Sent successfully!");
+            } else {
+                showAlert(`Error: ${data.error}`, false);
+            }
+        } catch (err) {
+            showAlert("System connection failed.", false);
+        }
+    }
+
+    function copyToClipboard() {
+        const urlText = document.getElementById('outputUrl').innerText;
+        const dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = urlText;
+        dummy.select();
+        document.execCommand("copy"); // Reliable clipboard fallback
+        document.body.removeChild(dummy);
+        showAlert("Copied API endpoint link to clipboard!");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        buildApiUrl();
+    });
+</script>
+
 </body>
 </html>
