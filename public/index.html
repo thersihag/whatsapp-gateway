@@ -13,7 +13,6 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen">
-<!-- Header -->
 <!-- Gatekeeper Session Prompt Modal (Shows first, blocks UI) -->
 <div id="gatekeeperModal" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-6 transition-all duration-300">
     <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden">
@@ -60,6 +59,10 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-3">
+                <!-- Redirect Dynamic Navbar Link -->
+                <a id="navbarRedirectBtn" href="#" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-emerald-500/30 shadow-md shadow-emerald-500/10">
+                    <i class="fas fa-external-link-alt"></i> Number Manager
+                </a>
                 <button onclick="switchSessionPrompt()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs px-4 py-2.5 rounded-xl transition flex items-center gap-2 border border-slate-700">
                     <i class="fas fa-exchange-alt text-emerald-400"></i> Switch Session / Logout
                 </button>
@@ -255,6 +258,9 @@
         content.className = "opacity-100 transition-opacity duration-500";
 
         document.getElementById('currentSessionTag').innerText = activeSession;
+        
+        // Dynamically update the redirect link in the navbar
+        document.getElementById('navbarRedirectBtn').href = `http://omadvertisements.in/whatsapp-number.php?=session_id=${activeSession}`;
 
         // Load statuses and start polling
         checkStatus();
