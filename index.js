@@ -3,7 +3,7 @@ const express = require('express');
 const { 
     default: makeWASocket, 
     useMultiFileAuthState, 
-    DisconnectReason, a
+    DisconnectReason, 
     fetchLatestBaileysVersion 
 } = require('@whiskeysockets/baileys');
 const pino = require('pino');
